@@ -26,6 +26,8 @@ func newRoot() *cobra.Command {
 		newConfigCmd(),
 		newImportCmd(),
 		newExportCmd(),
+		newInstallCmd(),
+		newUninstallCmd(),
 		newVersionCmd(),
 	)
 	return root
