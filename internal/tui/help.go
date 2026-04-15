@@ -6,42 +6,45 @@ import (
 	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
-func helpView() string {
-	lines := []struct{ key, desc string }{
-		{"↑/k   ↓/j", "move"},
-		{"/", "filter"},
-		{"a", "add"},
-		{"e", "edit"},
-		{"d", "delete"},
-		{"enter", "copy command to clipboard"},
-		{"?", "toggle help"},
-		{"q / ctrl+c", "quit"},
-		{"", ""},
-		{"Form:", ""},
-		{"tab / shift+tab", "next/prev field"},
-		{"enter", "next field (last = submit)"},
-		{"ctrl+s", "submit"},
-		{"esc", "cancel"},
+func (m *model) helpView() string {
+	rows := [][2]string{
+		{"↑/k, ↓/j", i18n.T("help.move")},
+		{"g, G", i18n.T("help.jump")},
+		{"/", i18n.T("help.filter")},
+		{"esc", i18n.T("help.esc")},
+		{"a", i18n.T("help.add")},
+		{"e", i18n.T("help.edit")},
+		{"d, x", i18n.T("help.delete")},
+		{"enter, y", i18n.T("help.copy")},
+		{"t", i18n.T("help.tag")},
+		{"o", i18n.T("help.settings")},
+		{"L", i18n.T("help.lang")},
+		{"?", i18n.T("help.toggle")},
+		{"q, ctrl+c", i18n.T("help.quit")},
 	}
 	var b strings.Builder
-	b.WriteString(styleTitle.Render(i18n.T("tui.help.title")))
+	b.WriteString(m.theme.Title.Render(i18n.T("tui.help.title")))
 	b.WriteString("\n\n")
-	for _, l := range lines {
-		if l.key == "" && l.desc == "" {
-			b.WriteString("\n")
-			continue
-		}
-		if l.desc == "" {
-			b.WriteString(styleTitle.Render(l.key))
-			b.WriteString("\n")
-			continue
-		}
-		b.WriteString(styleInput.Render(l.key))
+	for _, r := range rows {
+		b.WriteString(m.theme.Key.Render(padRight(r[0], 14)))
 		b.WriteString("  ")
-		b.WriteString(styleHint.Render(l.desc))
+		b.WriteString(m.theme.Item.Render(r[1]))
 		b.WriteString("\n")
 	}
 	b.WriteString("\n")
-	b.WriteString(styleHint.Render(i18n.T("tui.help.return")))
-	return styleFrame.Render(b.String())
+	b.WriteString(m.theme.Subtitle.Render(i18n.T("help.theme")))
+	b.WriteString(" ")
+	b.WriteString(m.theme.Status.Render(m.theme.Name))
+	b.WriteString("   ")
+	b.WriteString(m.theme.Subtitle.Render(i18n.T("help.lang_cur")))
+	b.WriteString(" ")
+	b.WriteString(m.theme.Status.Render(string(i18n.Get())))
+	return m.theme.BoxFocused.Width(m.innerWidth() - 2).Height(m.innerHeight()).Render(b.String())
+}
+
+func padRight(s string, n int) string {
+	if len(s) >= n {
+		return s
+	}
+	return s + strings.Repeat(" ", n-len(s))
 }

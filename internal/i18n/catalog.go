@@ -28,25 +28,85 @@ var en = map[string]string{
 	"msg.install_hint":   "open a new terminal or `source` the rc file to pick up your aliases.",
 	"msg.import_summary": "imported %d new, updated %d, skipped %d",
 
-	// TUI
-	"tui.title":                "aka — aliases",
-	"tui.form.add":             "Add alias",
-	"tui.form.edit":            "Edit alias",
-	"tui.form.field.name":      "name",
-	"tui.form.field.command":   "command",
-	"tui.form.field.shells":    "shells (zsh,bash,fish — blank = all)",
-	"tui.form.field.tags":      "tags (comma-separated)",
-	"tui.form.field.desc":      "description",
-	"tui.form.hint":            "tab/shift+tab move · enter next/submit · ctrl+s submit · esc cancel",
-	"tui.list.hint":            "a add · e edit · d delete · enter copy · / filter · ? help · q quit",
-	"tui.confirm.title":        "Delete %s?",
-	"tui.confirm.hint":         "y = yes   ·   n/esc = no",
-	"tui.help.title":           "aka — keys",
-	"tui.help.return":          "press any key to return",
-	"tui.status.saved":         "saved: %s",
-	"tui.status.deleted":       "deleted: %s",
-	"tui.status.copied":        "copied: %s",
-	"tui.status.clipboard_err": "clipboard error: %s",
+	// TUI — header / footers
+	"tui.header.count":    "%d aliases",
+	"tui.footer.list":     "a add · e edit · d delete · enter copy · / filter · t by tag · o settings · L lang · ? help · q quit",
+	"tui.footer.filter":   "type to filter · enter to confirm · esc to clear",
+	"tui.footer.form":     "tab/shift+tab move · enter next · ctrl+s submit · esc cancel",
+	"tui.footer.confirm":  "y/enter yes · n/esc no · ←/→/tab toggle",
+	"tui.footer.back":     "press any key to return",
+	"tui.footer.settings": "↑/↓ pick · ←/→ cycle · esc back",
+
+	// TUI — empty / placeholders
+	"tui.empty":      "no aliases yet — press a to add one",
+	"tui.no_matches": "no matches",
+
+	// TUI — preview pane
+	"tui.preview.created": "created %s",
+	"tui.preview.last":    "last used %s",
+
+	// TUI — form
+	"tui.form.add":            "Add alias",
+	"tui.form.edit":           "Edit alias",
+	"tui.field.name":          "name",
+	"tui.field.command":       "command",
+	"tui.field.shells":        "shells",
+	"tui.field.tags":          "tags",
+	"tui.field.desc":          "description",
+	"tui.placeholder.name":    "(alias name)",
+	"tui.placeholder.command": "(shell command)",
+	"tui.placeholder.shells":  "(zsh,bash,fish — blank = all)",
+	"tui.placeholder.tags":    "(comma-separated)",
+	"tui.placeholder.desc":    "(optional description)",
+
+	// TUI — confirm
+	"tui.confirm.title": "Delete alias?",
+	"tui.confirm.yes":   "Yes",
+	"tui.confirm.no":    "No",
+
+	// TUI — help screen
+	"tui.help.title": "aka — keyboard shortcuts",
+	"help.move":      "move up / down",
+	"help.jump":      "jump to top / bottom",
+	"help.filter":    "filter aliases",
+	"help.esc":       "clear filter / go back",
+	"help.add":       "add a new alias",
+	"help.edit":      "edit selected alias",
+	"help.delete":    "delete selected alias",
+	"help.copy":      "copy command to clipboard",
+	"help.tag":       "filter by selected tag",
+	"help.settings":  "open settings",
+	"help.lang":      "toggle language (en ↔ es)",
+	"help.toggle":    "toggle this help",
+	"help.quit":      "quit",
+	"help.theme":     "theme:",
+	"help.lang_cur":  "language:",
+
+	// TUI — settings
+	"tui.settings.title":      "Settings",
+	"tui.settings.desc":       "Cycle values with ← / → (or enter); changes are saved to config.toml.",
+	"settings.language":       "language",
+	"settings.theme":          "theme",
+	"settings.confirm_delete": "confirm before delete",
+	"settings.on":             "on",
+	"settings.off":            "off",
+
+	// TUI — status messages
+	"tui.status.saved":     "saved %s",
+	"tui.status.deleted":   "deleted %s",
+	"tui.status.copied":    "copied: %s",
+	"tui.status.copyfail":  "clipboard error: %s",
+	"tui.status.delfail":   "delete failed: %s",
+	"tui.status.tag_set":   "tag filter: #%s",
+	"tui.status.tag_clear": "tag filter cleared",
+	"tui.status.lang":      "language: %s",
+
+	// TUI — form errors (i18n keys used as errMsg)
+	"err.empty_name":    "name is required",
+	"err.empty_command": "command is required",
+	"err.validation":    "validation failed — see status line",
+	"err.rename":        "rename failed — see status line",
+	"err.exists":        "an alias with that name already exists",
 }
 
 // es is the Spanish catalog. Keep every key in sync with en.
@@ -76,23 +136,83 @@ var es = map[string]string{
 	"msg.install_hint":   "abre una terminal nueva o haz `source` del rc para cargar los aliases.",
 	"msg.import_summary": "importados %d nuevos, actualizados %d, omitidos %d",
 
-	// TUI
-	"tui.title":                "aka — aliases",
-	"tui.form.add":             "Añadir alias",
-	"tui.form.edit":            "Editar alias",
-	"tui.form.field.name":      "nombre",
-	"tui.form.field.command":   "comando",
-	"tui.form.field.shells":    "shells (zsh,bash,fish — vacío = todos)",
-	"tui.form.field.tags":      "etiquetas (separadas por coma)",
-	"tui.form.field.desc":      "descripción",
-	"tui.form.hint":            "tab/shift+tab mover · enter siguiente/enviar · ctrl+s enviar · esc cancelar",
-	"tui.list.hint":            "a añadir · e editar · d borrar · enter copiar · / filtrar · ? ayuda · q salir",
-	"tui.confirm.title":        "¿Eliminar %s?",
-	"tui.confirm.hint":         "s = sí   ·   n/esc = no",
-	"tui.help.title":           "aka — teclas",
-	"tui.help.return":          "pulsa cualquier tecla para volver",
-	"tui.status.saved":         "guardado: %s",
-	"tui.status.deleted":       "eliminado: %s",
-	"tui.status.copied":        "copiado: %s",
-	"tui.status.clipboard_err": "error de portapapeles: %s",
+	// TUI — header / footers
+	"tui.header.count":    "%d aliases",
+	"tui.footer.list":     "a añadir · e editar · d borrar · enter copiar · / filtrar · t por tag · o ajustes · L idioma · ? ayuda · q salir",
+	"tui.footer.filter":   "escribe para filtrar · enter para confirmar · esc para limpiar",
+	"tui.footer.form":     "tab/shift+tab mover · enter siguiente · ctrl+s enviar · esc cancelar",
+	"tui.footer.confirm":  "s/enter sí · n/esc no · ←/→/tab alternar",
+	"tui.footer.back":     "pulsa cualquier tecla para volver",
+	"tui.footer.settings": "↑/↓ elegir · ←/→ cambiar · esc volver",
+
+	// TUI — empty / placeholders
+	"tui.empty":      "aún no hay aliases — pulsa a para añadir uno",
+	"tui.no_matches": "sin resultados",
+
+	// TUI — preview pane
+	"tui.preview.created": "creado %s",
+	"tui.preview.last":    "última vez %s",
+
+	// TUI — form
+	"tui.form.add":            "Añadir alias",
+	"tui.form.edit":           "Editar alias",
+	"tui.field.name":          "nombre",
+	"tui.field.command":       "comando",
+	"tui.field.shells":        "shells",
+	"tui.field.tags":          "etiquetas",
+	"tui.field.desc":          "descripción",
+	"tui.placeholder.name":    "(nombre del alias)",
+	"tui.placeholder.command": "(comando shell)",
+	"tui.placeholder.shells":  "(zsh,bash,fish — vacío = todos)",
+	"tui.placeholder.tags":    "(separadas por coma)",
+	"tui.placeholder.desc":    "(descripción opcional)",
+
+	// TUI — confirm
+	"tui.confirm.title": "¿Eliminar alias?",
+	"tui.confirm.yes":   "Sí",
+	"tui.confirm.no":    "No",
+
+	// TUI — help screen
+	"tui.help.title": "aka — atajos de teclado",
+	"help.move":      "mover arriba / abajo",
+	"help.jump":      "ir al principio / final",
+	"help.filter":    "filtrar aliases",
+	"help.esc":       "limpiar filtro / volver",
+	"help.add":       "añadir un alias",
+	"help.edit":      "editar alias seleccionado",
+	"help.delete":    "borrar alias seleccionado",
+	"help.copy":      "copiar comando al portapapeles",
+	"help.tag":       "filtrar por etiqueta seleccionada",
+	"help.settings":  "abrir ajustes",
+	"help.lang":      "cambiar idioma (en ↔ es)",
+	"help.toggle":    "mostrar/ocultar esta ayuda",
+	"help.quit":      "salir",
+	"help.theme":     "tema:",
+	"help.lang_cur":  "idioma:",
+
+	// TUI — settings
+	"tui.settings.title":      "Ajustes",
+	"tui.settings.desc":       "Cambia los valores con ← / → (o enter); los cambios se guardan en config.toml.",
+	"settings.language":       "idioma",
+	"settings.theme":          "tema",
+	"settings.confirm_delete": "confirmar antes de borrar",
+	"settings.on":             "sí",
+	"settings.off":            "no",
+
+	// TUI — status messages
+	"tui.status.saved":     "guardado %s",
+	"tui.status.deleted":   "eliminado %s",
+	"tui.status.copied":    "copiado: %s",
+	"tui.status.copyfail":  "error de portapapeles: %s",
+	"tui.status.delfail":   "error al borrar: %s",
+	"tui.status.tag_set":   "filtro de tag: #%s",
+	"tui.status.tag_clear": "filtro de tag limpiado",
+	"tui.status.lang":      "idioma: %s",
+
+	// TUI — form errors (i18n keys used as errMsg)
+	"err.empty_name":    "el nombre es obligatorio",
+	"err.empty_command": "el comando es obligatorio",
+	"err.validation":    "validación fallida — revisa la línea de estado",
+	"err.rename":        "renombrado fallido — revisa la línea de estado",
+	"err.exists":        "ya existe un alias con ese nombre",
 }

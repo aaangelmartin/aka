@@ -2,12 +2,9 @@
 package tui
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/aaangelmartin/aka/internal/config"
-	"github.com/aaangelmartin/aka/internal/emit"
 	"github.com/aaangelmartin/aka/internal/store"
 )
 
@@ -35,19 +32,8 @@ func Run() error {
 		return err
 	}
 
-	applyTheme(cfg.Theme)
-
-	m := newAppModel(s, cfg, outDir)
-	p := tea.NewProgram(m, tea.WithAltScreen())
+	m := newModel(s, cfg, outDir)
+	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err = p.Run()
 	return err
-}
-
-// commit persists the store and regenerates the shell files. Shared by TUI
-// mutations.
-func commitStore(s *store.Store, outDir string) error {
-	if err := s.Save(); err != nil {
-		return fmt.Errorf("save aliases: %w", err)
-	}
-	return emit.Regenerate(outDir, s.List())
 }
