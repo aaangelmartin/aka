@@ -2,14 +2,15 @@ package tui
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/atotto/clipboard"
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
+	"github.com/aaangelmartin/aka/internal/alias"
 	"github.com/aaangelmartin/aka/internal/config"
+	"github.com/aaangelmartin/aka/internal/emit"
 	"github.com/aaangelmartin/aka/internal/i18n"
 	"github.com/aaangelmartin/aka/internal/store"
 )
@@ -21,65 +22,73 @@ const (
 	screenForm
 	screenConfirm
 	screenHelp
+	screenSettings
 )
 
-type appModel struct {
+type formMode int
+
+const (
+	formAdd formMode = iota
+	formEdit
+)
+
+// model is the TUI root model. It owns the store handle, the current theme,
+// every screen's transient state, and the shared dimensions / status line.
+type model struct {
 	store  *store.Store
 	cfg    config.Config
 	outDir string
+	theme  Theme
+	keys   keyMap
 
 	screen screen
-	list   list.Model
 
-	form    formModel
-	confirm confirmModel
-	keys    keyMap
+	// list state
+	items      []alias.Alias
+	filter     string
+	filterMode bool
+	cursor     int
+	offset     int
+	tagFilter  string
 
+	// form state
+	form     formModel
+	formKind formMode
+
+	// confirm state
+	confirmTarget alias.Alias
+	confirmYes    bool
+
+	// settings state
+	settings settingsModel
+
+	// dimensions
+	width  int
+	height int
+
+	// status line (auto-fades after 3s)
 	status    string
 	statusExp time.Time
-	width     int
-	height    int
 }
 
-type clearStatusMsg struct{}
-
-func newAppModel(s *store.Store, cfg config.Config, outDir string) *appModel {
-	delegate := list.NewDefaultDelegate()
-	lst := list.New(itemsFromStore(s), delegate, 0, 0)
-	lst.Title = i18n.T("tui.title")
-	lst.SetShowStatusBar(false)
-	lst.SetFilteringEnabled(true)
-	lst.SetShowHelp(false)
-	return &appModel{
-		store:  s,
-		cfg:    cfg,
-		outDir: outDir,
-		list:   lst,
-		form:   newForm(),
-		keys:   newKeys(),
+func newModel(st *store.Store, cfg config.Config, outDir string) *model {
+	return &model{
+		store:    st,
+		cfg:      cfg,
+		outDir:   outDir,
+		theme:    ThemeByName(cfg.Theme),
+		keys:     defaultKeys(),
+		screen:   screenList,
+		items:    st.List(),
+		settings: newSettingsModel(cfg),
 	}
 }
 
-func itemsFromStore(s *store.Store) []list.Item {
-	entries := s.List()
-	out := make([]list.Item, 0, len(entries))
-	for _, a := range entries {
-		out = append(out, aliasItem{a})
-	}
-	return out
-}
+func (m *model) Init() tea.Cmd { return nil }
 
-func (m *appModel) Init() tea.Cmd { return nil }
-
-func (m *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		m.width, m.height = msg.Width, msg.Height
-		m.list.SetSize(msg.Width, msg.Height-3)
-	case clearStatusMsg:
-		if time.Now().After(m.statusExp) {
-			m.status = ""
-		}
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if w, ok := msg.(tea.WindowSizeMsg); ok {
+		m.width, m.height = w.Width, w.Height
 	}
 
 	switch m.screen {
@@ -91,160 +100,164 @@ func (m *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateConfirm(msg)
 	case screenHelp:
 		return m.updateHelp(msg)
+	case screenSettings:
+		return m.updateSettings(msg)
 	}
 	return m, nil
 }
 
-func (m *appModel) updateList(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// Forward any filter-mode typing straight to the list.
-	if m.list.FilterState() == list.Filtering {
-		var cmd tea.Cmd
-		m.list, cmd = m.list.Update(msg)
-		return m, cmd
+func (m *model) View() string {
+	header := m.headerView()
+	var body string
+	switch m.screen {
+	case screenList:
+		body = m.listView()
+	case screenForm:
+		body = m.formView()
+	case screenConfirm:
+		body = m.confirmView()
+	case screenHelp:
+		body = m.helpView()
+	case screenSettings:
+		body = m.settingsView()
 	}
-	if km, ok := msg.(tea.KeyMsg); ok {
-		switch {
-		case key.Matches(km, m.keys.Quit):
-			return m, tea.Quit
-		case key.Matches(km, m.keys.Help):
-			m.screen = screenHelp
-			return m, nil
-		case key.Matches(km, m.keys.Add):
-			m.form.reset(modeAdd)
-			m.screen = screenForm
-			return m, nil
-		case key.Matches(km, m.keys.Edit):
-			if sel, ok := m.list.SelectedItem().(aliasItem); ok {
-				m.form = newForm()
-				m.form.loadFromAlias(sel.Alias)
-				m.screen = screenForm
-			}
-			return m, nil
-		case key.Matches(km, m.keys.Delete):
-			if sel, ok := m.list.SelectedItem().(aliasItem); ok {
-				m.confirm = confirmModel{target: sel.Alias}
-				m.screen = screenConfirm
-			}
-			return m, nil
-		case key.Matches(km, m.keys.Copy):
-			if sel, ok := m.list.SelectedItem().(aliasItem); ok {
-				if err := clipboard.WriteAll(sel.Command); err != nil {
-					return m, m.flash("clipboard error: " + err.Error())
-				}
-				return m, m.flash("copied: " + sel.Command)
-			}
-			return m, nil
-		}
-	}
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
+	footer := m.footerView()
+	return lipgloss.JoinVertical(lipgloss.Left, header, body, footer)
 }
 
-func (m *appModel) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
-	form, cmd, act := m.form.update(msg, m.keys)
-	m.form = form
-	switch act {
-	case formCancel:
-		m.screen = screenList
-		return m, nil
-	case formSubmit:
-		a, err := m.form.buildAlias()
-		if err != nil {
-			m.form.err = err.Error()
-			return m, nil
-		}
-		if m.form.mode == modeAdd {
-			if err := m.store.Put(a); err != nil {
-				m.form.err = err.Error()
-				return m, nil
-			}
-		} else {
-			if a.Name != m.form.origName {
-				if err := m.store.Rename(m.form.origName, a.Name); err != nil {
-					m.form.err = err.Error()
-					return m, nil
-				}
-			}
-			m.store.Set(a)
-		}
-		if err := commitStore(m.store, m.outDir); err != nil {
-			m.form.err = err.Error()
-			return m, nil
-		}
-		m.reloadList()
-		m.screen = screenList
-		return m, m.flash(i18n.Tf("tui.status.saved", a.Name))
-	}
-	return m, cmd
-}
+// ---------- shared helpers ----------
 
-func (m *appModel) updateConfirm(msg tea.Msg) (tea.Model, tea.Cmd) {
-	c, act := m.confirm.update(msg, m.keys)
-	m.confirm = c
-	switch act {
-	case confirmYes:
-		name := c.target.Name
-		if err := m.store.Delete(name); err != nil {
-			m.screen = screenList
-			return m, m.flash("error: " + err.Error())
-		}
-		if err := commitStore(m.store, m.outDir); err != nil {
-			m.screen = screenList
-			return m, m.flash("error: " + err.Error())
-		}
-		m.reloadList()
-		m.screen = screenList
-		return m, m.flash(i18n.Tf("tui.status.deleted", name))
-	case confirmNo:
-		m.screen = screenList
-		return m, nil
-	}
-	return m, nil
-}
-
-func (m *appModel) updateHelp(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if _, ok := msg.(tea.KeyMsg); ok {
-		m.screen = screenList
-	}
-	return m, nil
-}
-
-func (m *appModel) reloadList() {
-	items := itemsFromStore(m.store)
-	m.list.SetItems(items)
-}
-
-func (m *appModel) flash(s string) tea.Cmd {
+func (m *model) setStatus(s string) {
 	m.status = s
 	m.statusExp = time.Now().Add(3 * time.Second)
-	return tea.Tick(3*time.Second, func(time.Time) tea.Msg { return clearStatusMsg{} })
 }
 
-func (m *appModel) View() string {
+// commit saves the store and regenerates shell files. All mutating handlers
+// call this; the return error is surfaced in the status line.
+func (m *model) commit() error {
+	if err := m.store.Save(); err != nil {
+		return err
+	}
+	return emit.Regenerate(m.outDir, m.store.List())
+}
+
+func (m *model) refresh() {
+	m.items = m.store.List()
+	if f := m.filteredItems(); m.cursor >= len(f) {
+		m.cursor = len(f) - 1
+	}
+	if m.cursor < 0 {
+		m.cursor = 0
+	}
+}
+
+func (m *model) filteredItems() []alias.Alias {
+	q := strings.ToLower(strings.TrimSpace(m.filter))
+	out := make([]alias.Alias, 0, len(m.items))
+	for _, a := range m.items {
+		if m.tagFilter != "" && !hasTag(a, m.tagFilter) {
+			continue
+		}
+		if q == "" {
+			out = append(out, a)
+			continue
+		}
+		if strings.Contains(strings.ToLower(a.Name), q) ||
+			strings.Contains(strings.ToLower(a.Command), q) ||
+			strings.Contains(strings.ToLower(a.Description), q) {
+			out = append(out, a)
+			continue
+		}
+		for _, t := range a.Tags {
+			if strings.Contains(strings.ToLower(t), q) {
+				out = append(out, a)
+				break
+			}
+		}
+	}
+	return out
+}
+
+func hasTag(a alias.Alias, tag string) bool {
+	for _, t := range a.Tags {
+		if t == tag {
+			return true
+		}
+	}
+	return false
+}
+
+// ---------- dimensions ----------
+
+func (m *model) innerWidth() int {
+	if m.width == 0 {
+		return 100
+	}
+	return m.width
+}
+
+func (m *model) innerHeight() int {
+	if m.height == 0 {
+		return 24
+	}
+	return max(6, m.height-3) // header + footer
+}
+
+func (m *model) leftWidth() int  { return max(28, m.innerWidth()*2/5) }
+func (m *model) rightWidth() int { return max(28, m.innerWidth()-m.leftWidth()) }
+
+// ---------- header / footer ----------
+
+func (m *model) headerView() string {
+	title := m.theme.Title.Render(" aka ")
+	sub := m.theme.Subtitle.Render(i18n.Tf("tui.header.count", len(m.items)))
+	extras := ""
+	if m.filterMode || m.filter != "" {
+		extras += m.theme.Status.Render(fmt.Sprintf("  /%s", m.filter))
+	}
+	if m.tagFilter != "" {
+		extras += "  " + m.theme.Tag.Render(fmt.Sprintf("[#%s]", m.tagFilter))
+	}
+	return title + "  " + sub + extras
+}
+
+func (m *model) footerView() string {
+	if m.status != "" && time.Now().Before(m.statusExp) {
+		return m.theme.Status.Render(" " + m.status)
+	}
 	switch m.screen {
+	case screenList:
+		if m.filterMode {
+			return m.theme.Help.Render(i18n.T("tui.footer.filter"))
+		}
+		return m.theme.Help.Render(i18n.T("tui.footer.list"))
 	case screenForm:
-		return centerOver(m.form.view(), m.width, m.height)
+		return m.theme.Help.Render(i18n.T("tui.footer.form"))
 	case screenConfirm:
-		return centerOver(m.confirm.view(), m.width, m.height)
+		return m.theme.Help.Render(i18n.T("tui.footer.confirm"))
 	case screenHelp:
-		return centerOver(helpView(), m.width, m.height)
+		return m.theme.Help.Render(i18n.T("tui.footer.back"))
+	case screenSettings:
+		return m.theme.Help.Render(i18n.T("tui.footer.settings"))
 	}
-	// List view with a trailing status/hint line.
-	bottom := styleHint.Render(i18n.T("tui.list.hint"))
-	if m.status != "" {
-		bottom = styleOK.Render(m.status) + "   " + bottom
-	}
-	return fmt.Sprintf("%s\n%s", m.list.View(), bottom)
+	return ""
 }
 
-// centerOver draws body centered on a terminal of (w, h). When dimensions are
-// unknown (0) it just returns body.
-func centerOver(body string, w, h int) string {
-	if w == 0 || h == 0 {
-		return body
+// ---------- help screen update (simple) ----------
+
+func (m *model) updateHelp(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if k, ok := msg.(tea.KeyMsg); ok {
+		switch k.String() {
+		case "esc", "q", "?":
+			m.screen = screenList
+		}
 	}
-	// Simple centering: prepend blank lines. Lipgloss has Place but we keep
-	// this minimal to avoid another dependency on its layout helpers.
-	return body
+	return m, nil
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

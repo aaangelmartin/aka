@@ -10,6 +10,26 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-04-15
+
+### Changed / Cambios
+- EN — TUI redesigned to match GoTo's look and key bindings. Muscle memory now carries between both tools.
+- ES — TUI rediseñada para igualar el aspecto y teclas de GoTo. La memoria muscular se comparte entre las dos herramientas.
+
+### Added / Añadido
+- EN — Two-column list + preview layout with `#00B5E2`-accented rounded borders and per-screen footer hints.
+- ES — Diseño de dos columnas (lista + preview) con bordes redondeados en `#00B5E2` y pistas por pantalla en el pie.
+- EN — New keys: `y` copy (alias of Enter), `t` filter by selected tag, `g`/`G` jump to top/bottom, `L` toggle language (persisted), `o` open in-TUI settings screen, `x` delete (alias of `d`).
+- ES — Nuevas teclas: `y` copiar (alias de Enter), `t` filtrar por etiqueta, `g`/`G` ir al principio/final, `L` cambiar idioma (se guarda), `o` pantalla de ajustes dentro del TUI, `x` borrar (alias de `d`).
+- EN — Inline settings screen (language / theme / confirm-delete cycles). Changes persist to `config.toml` immediately.
+- ES — Pantalla de ajustes interna (ciclos de idioma / tema / confirmar-borrado). Los cambios se guardan en `config.toml` al momento.
+- EN — Shell badge per row and rich preview pane with command, tags, description, created/last-used timestamps.
+- ES — Badge de shell por fila y panel de preview con el comando, etiquetas, descripción y fechas.
+- EN — Auto-fade status line (3 s) for copy/save/delete notifications.
+- ES — Línea de estado con fade automático (3 s) para avisos de copia/guardado/borrado.
+- EN — Two extra themes: `catppuccin` and `tokyonight`, on top of `default` / `dracula` / `nord` / `gruvbox`.
+- ES — Dos temas extra: `catppuccin` y `tokyonight`, además de `default` / `dracula` / `nord` / `gruvbox`.
+
 ## [1.0.0] — 2026-04-15
 
 First stable release. Feature set below was already complete by 0.5.0;
