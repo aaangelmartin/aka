@@ -6,12 +6,14 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newExportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export [file]",
-		Short: "Export aliases as JSON (stdout if no file given)",
+		Short: i18n.T("cli.export.short"),
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sess, err := openSession()

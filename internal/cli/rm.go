@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newRmCmd() *cobra.Command {
@@ -14,7 +16,7 @@ func newRmCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rm <name>",
 		Aliases: []string{"remove", "delete"},
-		Short:   "Remove an alias",
+		Short:   i18n.T("cli.rm.short"),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -27,11 +29,13 @@ func newRmCmd() *cobra.Command {
 				return err
 			}
 			if !yes && sess.cfg.ConfirmDelete {
-				fmt.Fprintf(cmd.OutOrStdout(), "delete %s (%s)? [y/N] ", a.Name, a.Command)
+				fmt.Fprint(cmd.OutOrStdout(), i18n.Tf("msg.confirm_delete", a.Name, a.Command))
 				reader := bufio.NewReader(os.Stdin)
 				line, _ := reader.ReadString('\n')
-				if !strings.HasPrefix(strings.ToLower(strings.TrimSpace(line)), "y") {
-					fmt.Fprintln(cmd.OutOrStdout(), "aborted")
+				trimmed := strings.ToLower(strings.TrimSpace(line))
+				// Accept "y"/"yes" (English) or "s"/"sí"/"si" (Spanish).
+				if !strings.HasPrefix(trimmed, "y") && !strings.HasPrefix(trimmed, "s") {
+					fmt.Fprintln(cmd.OutOrStdout(), i18n.T("msg.aborted"))
 					return nil
 				}
 			}
@@ -41,7 +45,7 @@ func newRmCmd() *cobra.Command {
 			if err := sess.commit(); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "removed %s\n", a.Name)
+			fmt.Fprintln(cmd.OutOrStdout(), i18n.Tf("msg.removed", a.Name))
 			return nil
 		},
 	}

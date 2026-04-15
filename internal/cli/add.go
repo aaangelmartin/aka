@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/aaangelmartin/aka/internal/alias"
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newAddCmd() *cobra.Command {
@@ -19,7 +20,7 @@ func newAddCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "add <name> <command>...",
-		Short: "Add a new alias",
+		Short: i18n.T("cli.add.short"),
 		Long:  "Add a new alias. The command may be passed as multiple arguments; they are joined with a single space.",
 		Args:  cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -53,7 +54,7 @@ func newAddCmd() *cobra.Command {
 			if err := sess.commit(); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "added %s → %s\n", name, command)
+			fmt.Fprintln(cmd.OutOrStdout(), i18n.Tf("msg.added", name, command))
 			return nil
 		},
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/aaangelmartin/aka/internal/alias"
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newEditCmd() *cobra.Command {
@@ -21,7 +22,7 @@ func newEditCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "edit <name>",
-		Short: "Edit an alias in place",
+		Short: i18n.T("cli.edit.short"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -79,13 +80,13 @@ func newEditCmd() *cobra.Command {
 				return err
 			}
 			if !changed {
-				fmt.Fprintf(cmd.OutOrStdout(), "no changes\n")
+				fmt.Fprintln(cmd.OutOrStdout(), i18n.T("msg.no_changes"))
 				return nil
 			}
 			if err := sess.commit(); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "updated %s\n", a.Name)
+			fmt.Fprintln(cmd.OutOrStdout(), i18n.Tf("msg.updated", a.Name))
 			return nil
 		},
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/aaangelmartin/aka/internal/alias"
+	"github.com/aaangelmartin/aka/internal/i18n"
 	"github.com/aaangelmartin/aka/internal/shellint"
 )
 
@@ -19,7 +20,7 @@ func newImportCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "import <file>",
-		Short: "Import aliases from JSON (or an rc file with --from-rc)",
+		Short: i18n.T("cli.import.short"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := args[0]
@@ -67,7 +68,7 @@ func newImportCmd() *cobra.Command {
 			if err := sess.commit(); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "imported %d new, updated %d, skipped %d\n", added, updated, skipped)
+			fmt.Fprintln(cmd.OutOrStdout(), i18n.Tf("msg.import_summary", added, updated, skipped))
 			return nil
 		},
 	}

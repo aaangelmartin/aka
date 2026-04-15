@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/aaangelmartin/aka/internal/alias"
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 type formMode int
@@ -39,11 +40,11 @@ type formModel struct {
 func newForm() formModel {
 	f := formModel{}
 	labels := [fldCount]string{
-		"name",
-		"command",
-		"shells (zsh,bash,fish — blank = all)",
-		"tags (comma-separated)",
-		"description",
+		i18n.T("tui.form.field.name"),
+		i18n.T("tui.form.field.command"),
+		i18n.T("tui.form.field.shells"),
+		i18n.T("tui.form.field.tags"),
+		i18n.T("tui.form.field.desc"),
 	}
 	for i := 0; i < fldCount; i++ {
 		ti := textinput.New()
@@ -160,9 +161,9 @@ func (f formModel) update(msg tea.Msg, k keyMap) (formModel, tea.Cmd, formAction
 
 func (f formModel) view() string {
 	var b strings.Builder
-	title := "Add alias"
+	title := i18n.T("tui.form.add")
 	if f.mode == modeEdit {
-		title = "Edit alias"
+		title = i18n.T("tui.form.edit")
 	}
 	b.WriteString(styleTitle.Render(title))
 	b.WriteString("\n\n")
@@ -180,6 +181,6 @@ func (f formModel) view() string {
 		b.WriteString(styleDanger.Render("✗ " + f.err))
 		b.WriteString("\n\n")
 	}
-	b.WriteString(styleHint.Render("tab/shift+tab move · enter next/submit · ctrl+s submit · esc cancel"))
+	b.WriteString(styleHint.Render(i18n.T("tui.form.hint")))
 	return styleFrame.Render(b.String())
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/aaangelmartin/aka/internal/alias"
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newLsCmd() *cobra.Command {
@@ -19,7 +20,7 @@ func newLsCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "ls",
-		Short: "List aliases",
+		Short: i18n.T("cli.ls.short"),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			sess, err := openSession()
 			if err != nil {
@@ -33,7 +34,7 @@ func newLsCmd() *cobra.Command {
 				return json.NewEncoder(cmd.OutOrStdout()).Encode(list)
 			}
 			if len(list) == 0 {
-				fmt.Fprintln(cmd.OutOrStdout(), "no aliases yet — try `aka add <name> <command>`")
+				fmt.Fprintln(cmd.OutOrStdout(), i18n.T("msg.no_aliases"))
 				return nil
 			}
 			w := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
