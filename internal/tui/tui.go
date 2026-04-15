@@ -35,6 +35,8 @@ func Run() error {
 		return err
 	}
 
+	applyTheme(cfg.Theme)
+
 	m := newAppModel(s, cfg, outDir)
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	_, err = p.Run()
