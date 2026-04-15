@@ -1,0 +1,43 @@
+version: "2"
+
+run:
+  timeout: 3m
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+    - revive
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Fprint
+        - (io.Closer).Close
+        - (*os.File).Close
+        - os.Remove
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: var-naming
+          disabled: true
+  exclusions:
+    rules:
+      # misspell is English-only; the i18n catalog holds Spanish strings.
+      - path: internal/i18n/catalog\.go
+        linters:
+          - misspell
+
+formatters:
+  enable:
+    - gofmt
+
+issues:
+  max-same-issues: 0

@@ -1,0 +1,110 @@
+version: 2
+
+project_name: aka
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: aka
+    main: ./cmd/aka
+    binary: aka
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/aaangelmartin/aka/internal/buildinfo.Version={{.Version}}
+      - -X github.com/aaangelmartin/aka/internal/buildinfo.Commit={{.ShortCommit}}
+      - -X github.com/aaangelmartin/aka/internal/buildinfo.Date={{.Date}}
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - NOTICE
+      - README.md
+      - README.es.md
+      - CHANGELOG.md
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Docs
+      regexp: '^.*?docs(\(.+\))??!?:.+$'
+      order: 2
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+
+release:
+  github:
+    owner: aaangelmartin
+    name: aka
+  name_template: "v{{ .Version }}"
+  draft: false
+  prerelease: auto
+  header: |
+    ## aka v{{ .Version }}
+
+    Manage shell aliases from the terminal with a TUI.
+  footer: |
+    **Install**
+
+    ```sh
+    brew install aaangelmartin/tap/aka
+    ```
+
+    Or grab a binary above.
+
+brews:
+  - name: aka
+    repository:
+      owner: aaangelmartin
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: "https://github.com/aaangelmartin/aka"
+    description: "Manage shell aliases from the terminal with a TUI"
+    license: Apache-2.0
+    directory: Formula
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    install: |
+      bin.install "aka"
+      generate_completions_from_executable(bin/"aka", "completion")
+    test: |
+      assert_match "aka", shell_output("#{bin}/aka version")

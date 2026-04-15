@@ -1,0 +1,26 @@
+# Binaries
+/aka
+/bin/
+/dist/
+
+# Go
+*.exe
+*.test
+*.out
+vendor/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Env
+.env
+.env.local
+
+# Local collaboration notes, kept off GitHub
+CLAUDE.md
+.claude/
