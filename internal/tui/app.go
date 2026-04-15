@@ -10,6 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/aaangelmartin/aka/internal/config"
+	"github.com/aaangelmartin/aka/internal/i18n"
 	"github.com/aaangelmartin/aka/internal/store"
 )
 
@@ -45,7 +46,7 @@ type clearStatusMsg struct{}
 func newAppModel(s *store.Store, cfg config.Config, outDir string) *appModel {
 	delegate := list.NewDefaultDelegate()
 	lst := list.New(itemsFromStore(s), delegate, 0, 0)
-	lst.Title = "aka — aliases"
+	lst.Title = i18n.T("tui.title")
 	lst.SetShowStatusBar(false)
 	lst.SetFilteringEnabled(true)
 	lst.SetShowHelp(false)
@@ -173,7 +174,7 @@ func (m *appModel) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.reloadList()
 		m.screen = screenList
-		return m, m.flash("saved: " + a.Name)
+		return m, m.flash(i18n.Tf("tui.status.saved", a.Name))
 	}
 	return m, cmd
 }
@@ -194,7 +195,7 @@ func (m *appModel) updateConfirm(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.reloadList()
 		m.screen = screenList
-		return m, m.flash("deleted: " + name)
+		return m, m.flash(i18n.Tf("tui.status.deleted", name))
 	case confirmNo:
 		m.screen = screenList
 		return m, nil
@@ -230,8 +231,7 @@ func (m *appModel) View() string {
 		return centerOver(helpView(), m.width, m.height)
 	}
 	// List view with a trailing status/hint line.
-	hint := "a add · e edit · d delete · enter copy · / filter · ? help · q quit"
-	bottom := styleHint.Render(hint)
+	bottom := styleHint.Render(i18n.T("tui.list.hint"))
 	if m.status != "" {
 		bottom = styleOK.Render(m.status) + "   " + bottom
 	}

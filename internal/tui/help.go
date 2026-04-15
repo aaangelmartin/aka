@@ -1,6 +1,10 @@
 package tui
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/aaangelmartin/aka/internal/i18n"
+)
 
 func helpView() string {
 	lines := []struct{ key, desc string }{
@@ -20,7 +24,7 @@ func helpView() string {
 		{"esc", "cancel"},
 	}
 	var b strings.Builder
-	b.WriteString(styleTitle.Render("aka — keys"))
+	b.WriteString(styleTitle.Render(i18n.T("tui.help.title")))
 	b.WriteString("\n\n")
 	for _, l := range lines {
 		if l.key == "" && l.desc == "" {
@@ -38,6 +42,6 @@ func helpView() string {
 		b.WriteString("\n")
 	}
 	b.WriteString("\n")
-	b.WriteString(styleHint.Render("press any key to return"))
+	b.WriteString(styleHint.Render(i18n.T("tui.help.return")))
 	return styleFrame.Render(b.String())
 }

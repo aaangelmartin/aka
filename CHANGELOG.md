@@ -10,6 +10,16 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-04-15
+
+### Added / Añadido
+- EN — Bilingual strings (EN/ES) across CLI help and TUI labels, driven by `internal/i18n` with a `TestCatalogParity` guard.
+- ES — Cadenas bilingües (EN/ES) en la ayuda CLI y etiquetas TUI, gestionadas en `internal/i18n` con el test `TestCatalogParity`.
+- EN — Global `--lang {en,es}` flag; default honours `language` in config and falls back to `$LANG`.
+- ES — Flag global `--lang {en,es}`; por defecto respeta `language` en config y usa `$LANG` como último recurso.
+- EN — Confirm prompt accepts both `y` (English) and `s` (Spanish).
+- ES — El prompt de confirmación acepta `y` (inglés) y `s` (español).
+
 ## [0.3.0] — 2026-04-15
 
 ### Added / Añadido

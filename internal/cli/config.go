@@ -9,12 +9,13 @@ import (
 
 	"github.com/aaangelmartin/aka/internal/alias"
 	"github.com/aaangelmartin/aka/internal/config"
+	"github.com/aaangelmartin/aka/internal/i18n"
 )
 
 func newConfigCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config [key] [value]",
-		Short: "Read or write a config key",
+		Short: i18n.T("cli.config.short"),
 		Long: `Read or write a config key (no args prints everything).
 
 Supported keys:
