@@ -10,6 +10,16 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-04-15
+
+### Added / Añadido
+- EN — `aka install [zsh|bash|fish|all]`: inserts a managed block into the rc file (markers `# >>> aka >>>` / `# <<< aka <<<`), with a timestamped backup.
+- ES — `aka install [zsh|bash|fish|all]`: inserta un bloque gestionado en el rc (marcas `# >>> aka >>>` / `# <<< aka <<<`), con copia de seguridad.
+- EN — `aka uninstall`: removes the managed block cleanly; user content is preserved.
+- ES — `aka uninstall`: elimina el bloque gestionado; el contenido del usuario se preserva.
+- EN — `aka import --from-rc <file>`: parses `alias` lines from an existing rc (handles single/double quotes and `'\''` escape).
+- ES — `aka import --from-rc <archivo>`: parsea líneas `alias` de un rc existente (soporta comillas y escape `'\''`).
+
 ## [0.2.0] — 2026-04-15
 
 ### Added / Añadido
