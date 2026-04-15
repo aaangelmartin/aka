@@ -22,10 +22,10 @@ import (
 //	confirm_delete  = true
 //	theme           = "default"
 type Config struct {
-	Language       string   `toml:"language"`
-	DefaultShells  []string `toml:"default_shells"`
-	ConfirmDelete  bool     `toml:"confirm_delete"`
-	Theme          string   `toml:"theme"`
+	Language      string   `toml:"language"`
+	DefaultShells []string `toml:"default_shells"`
+	ConfirmDelete bool     `toml:"confirm_delete"`
+	Theme         string   `toml:"theme"`
 }
 
 // Default returns the zero-value-safe defaults.

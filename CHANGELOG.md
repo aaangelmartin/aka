@@ -10,6 +10,16 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-04-15
+
+### Added / Añadido
+- EN — Interactive TUI (Bubble Tea): list with filter, add/edit form, delete confirm, help overlay.
+- ES — TUI interactiva (Bubble Tea): lista con filtro, formulario add/edit, confirmación de borrado, ayuda.
+- EN — `Enter` copies the highlighted command to the clipboard.
+- ES — `Enter` copia el comando destacado al portapapeles.
+- EN — Running `aka` with no args launches the TUI.
+- ES — Ejecutar `aka` sin argumentos lanza la TUI.
+
 ## [0.1.0] — 2026-04-15
 
 ### Added / Añadido

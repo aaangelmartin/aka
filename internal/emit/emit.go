@@ -72,7 +72,7 @@ func renderLine(shell string, a alias.Alias) string {
 }
 
 // singleQuote wraps s in single quotes, escaping embedded single quotes with
-// the standard POSIX trick (`'\''`). fish accepts the same form.
+// the standard POSIX trick (`'\”`). fish accepts the same form.
 func singleQuote(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
