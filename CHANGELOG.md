@@ -10,6 +10,16 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-04-15
+
 ### Added / Añadido
+- EN — CLI core: `add`, `ls`, `rm`, `edit`, `config`, `import`, `export`, `version`.
+- ES — Núcleo CLI: `add`, `ls`, `rm`, `edit`, `config`, `import`, `export`, `version`.
+- EN — JSON store with atomic writes (temp + rename) as the source of truth.
+- ES — Almacén JSON con escritura atómica (temp + rename) como fuente de verdad.
+- EN — Shell emitters for zsh / bash / fish, regenerated on every mutation.
+- ES — Generadores para zsh / bash / fish, regenerados en cada cambio.
+- EN — XDG-aware paths (`$AKA_CONFIG`, `$AKA_DATA`, `$AKA_OUTDIR` to override).
+- ES — Rutas XDG (`$AKA_CONFIG`, `$AKA_DATA`, `$AKA_OUTDIR` para sobreescribir).
 - EN — Repository bootstrap: scaffolding, Makefile, goreleaser, CI/release workflows, Apache 2.0 license, bilingual READMEs.
 - ES — Bootstrap del repositorio: estructura, Makefile, goreleaser, workflows CI/release, licencia Apache 2.0, READMEs bilingües.
