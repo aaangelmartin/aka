@@ -1,7 +1,11 @@
 // Package cli wires the Cobra command tree.
 package cli
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/aaangelmartin/aka/internal/tui"
+)
 
 func newRoot() *cobra.Command {
 	root := &cobra.Command{
@@ -10,6 +14,9 @@ func newRoot() *cobra.Command {
 		Long:          "aka — manage shell aliases from the terminal with a TUI. Multi-shell (zsh, bash, fish).",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			return tui.Run()
+		},
 	}
 	root.AddCommand(
 		newAddCmd(),
