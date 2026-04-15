@@ -10,6 +10,16 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-04-15
+
+First stable release. Feature set below was already complete by 0.5.0;
+1.0.0 adds the end-to-end integration tests that make the contract
+explicit, plus a final docs pass. No breaking changes relative to 0.5.0.
+
+### Added / Añadido
+- EN — In-process end-to-end tests covering add → ls → edit → rm → export → import and install → uninstall cycles.
+- ES — Tests end-to-end in-process que cubren add → ls → edit → rm → export → import y el ciclo install → uninstall.
+
 ## [0.5.0] — 2026-04-15
 
 ### Added / Añadido
