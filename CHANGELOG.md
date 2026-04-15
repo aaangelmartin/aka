@@ -10,6 +10,14 @@ siguen [SemVer](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-04-15
+
+### Added / Añadido
+- EN — Four TUI themes (`default`, `dracula`, `nord`, `gruvbox`). Selected with `aka config theme <name>`.
+- ES — Cuatro temas para la TUI (`default`, `dracula`, `nord`, `gruvbox`). Se eligen con `aka config theme <nombre>`.
+- EN — VHS demo tape (`demo/demo.tape`) so `make demo` regenerates the README GIF.
+- ES — Script VHS (`demo/demo.tape`) para regenerar el GIF del README con `make demo`.
+
 ## [0.4.0] — 2026-04-15
 
 ### Added / Añadido
